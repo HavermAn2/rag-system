@@ -1,7 +1,9 @@
 import extraction
 import chanking
 import cleaning_text
-
+import embeddings
+emb = embeddings.Embeddings()
+vectors = []
 extraction.extract_text()
 text = ""
 with open("output.txt", "r", encoding="utf-8") as file:
@@ -9,4 +11,7 @@ with open("output.txt", "r", encoding="utf-8") as file:
 
 cleared_text = cleaning_text.clean_text(text)
 words = chanking.chunking(cleared_text)
-print(words)
+for i,val in enumerate(words):
+    embedding = emb.video_to_vector(val)
+    vectors.append(embedding)
+print(vectors[-10])

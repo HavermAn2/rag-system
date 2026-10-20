@@ -2,14 +2,11 @@ text = "Python- /?is a powerful    pr!ogramming language us-ed for AI developmen
 
 
 
-def chunking(text,chunk_size=10):
+def chunking(text,chunk_size=60):
     chunk = []
     word = ""
     words = []
     for i, val in enumerate(text):
-
-
-
         if val.isspace():
             if word:
                 chunk.append(word)
@@ -27,7 +24,7 @@ def chunking(text,chunk_size=10):
 
     if chunk and (not words or chunk != words[-1]):
         words.append(chunk.copy())
-
+    words = [" ".join(chunk) for chunk in words]
     return words
 
 
