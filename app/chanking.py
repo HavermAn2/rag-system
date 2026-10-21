@@ -1,5 +1,5 @@
 
-def chunking(text,chunk_size=100, overlap=10):
+def chunking(text,chunk_size=80, overlap=16):
     if chunk_size <= 0:
         raise ValueError("chunk_size must be positive")
     if not 0 <= overlap < chunk_size:

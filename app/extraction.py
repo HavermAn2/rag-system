@@ -2,7 +2,7 @@ import pymupdf
 
 
 def extract_text():
-    doc = pymupdf.open("../Junior_Py_Dev.pdf") # open a document
+    doc = pymupdf.open("../6356c48f3b429782050d0025d29af5e5.pdf") # open a document
     out = open("output.txt", "wb") # create a text output
     for page in doc: # iterate the document pages
         text = page.get_text().encode("utf8") # get plain text (is in UTF-8)
