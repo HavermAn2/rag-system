@@ -1,8 +1,10 @@
-text = "Python- /?is a powerful    pr!ogramming language us-ed for AI development"
 
+def chunking(text,chunk_size=4, overlap=2):
+    if chunk_size <= 0:
+        raise ValueError("chunk_size must be positive")
+    if not 0 <= overlap < chunk_size:
+        raise ValueError("Invalid overlap")
 
-
-def chunking(text,chunk_size=60):
     chunk = []
     word = ""
     words = []
@@ -14,11 +16,9 @@ def chunking(text,chunk_size=60):
 
                 if len(chunk) == chunk_size:
                     words.append(chunk.copy())
-                    chunk = chunk[-1:]
-
+                    chunk = chunk[-overlap:]
         else:
             word += val
-
     if word:
         chunk.append(word)
 

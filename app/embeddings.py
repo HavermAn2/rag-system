@@ -1,4 +1,4 @@
-from sentence_transformers import SentenceTransformer, util
+from sentence_transformers import SentenceTransformer
 
 class Embeddings:
     def __init__(self):
@@ -7,8 +7,5 @@ class Embeddings:
         )
 
     def video_to_vector(self,text:str):
-        return self.model.encode(text)
+        return self.model.encode(text, batch_size=32)
     
-
-    # def compare_vectors(self, first_vector, second_vector) -> float:
-    #     return util.cos_sim(first_vector, second_vector).item()
