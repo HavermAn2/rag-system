@@ -1,24 +1,27 @@
-import extraction
-import chanking
-import cleaning_text
-import embeddings
-
+import ingestion.extraction as extraction
+import ingestion.chanking as chanking
+import ingestion.cleaning_text as cleaning_text
+import embeddings.embeddings as embeddings
+from ingestion.extraction import Extraction 
+model = SentenceTransformer("intfloat/multilingual-e5-base")
 class Run:
-    def __init__(self):
+    def __init__(self,question):
         self.emb = embeddings.Embeddings()
+        self.chunks = []
         self.vectors = []
-        self.text =""
-        extraction.extract_text()
+        self.title = ""
+        self.text = ""
+        self.extraction = Extraction(path = "Junior_Py_Dev.pdf")
+        self.question = question
+        
     def run(self):
-        with open("output.txt", "r", encoding="utf-8") as file:
-            self.text = file.read()
-        cleared_text = cleaning_text.clean_text(self.text)
-        words = chanking.chunking(cleared_text)
-        embedding = self.emb.video_to_vector(words)
-        self.vectors.extend(embedding)
-        return self.vectors,words
-# r=Run()
-# res = r.run()
+        self.text,self.title = self.extraction.extract_text()
+        _cleared_text = cleaning_text.clean_text(self.text)
+        self.chunks = chanking.chunking(_cleared_text)
+        self.vectors = self.emb.text_to_vector(self.chunks)
+        query_vector = model.encode(self.question).tolist()
+        return self.vectors,self.chunks,self.title
+
 
 
 
