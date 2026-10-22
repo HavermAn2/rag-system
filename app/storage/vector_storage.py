@@ -1,42 +1,25 @@
-from qdrant_client import QdrantClient,models
+from qdrant_client import QdrantClient
 from sentence_transformers import SentenceTransformer
-from main import Run
+from query import Query
+from upload import Upload
+from ingestion.extraction import Extraction
 client = QdrantClient(url="http://localhost:6333")
 model = SentenceTransformer("intfloat/multilingual-e5-base")
-        
-
+query = "Типы данных в Пайтон" 
+extraction = Extraction("data/Junior_Py_Dev.py")
+txt,title = extraction.extract_text()
 COLLECTION_NAME = "docs"
-r = Run("Типы данных в Пайтон")
-vectors,text,title = r.run()
-client.delete_collection(collection_name=COLLECTION_NAME)
-if not client.collection_exists(COLLECTION_NAME):
-    client.create_collection(
-        collection_name=COLLECTION_NAME,
-        vectors_config=models.VectorParams(
-            size=768,
-            distance=models.Distance.DOT
-        )
-    )
+q = Query(client,COLLECTION_NAME,model)
+u = Upload(client,COLLECTION_NAME)
 
-points = [
-    models.PointStruct(
-        id=idx,
-        vector=vector.tolist() if hasattr(vector, "tolist") else vector,
-        payload={
-            "title": title,
-            "text": chunk,
-            "chunk_index": idx,
-            "page": 1,
-        }
-    )
-    for idx, (chunk, vector) in enumerate(zip(text, vectors))
-]
+res = q.request_query(query,15)
+upload = u.create_point_qdrant()
+print(res)
 
 
-client.upload_points(
-    collection_name=COLLECTION_NAME,
-    points=points
-)
+
+
+
 
 
 
