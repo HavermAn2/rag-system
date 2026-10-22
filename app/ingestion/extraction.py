@@ -25,6 +25,3 @@ class Extraction:
         )
         return text, title
 
-# r = Extraction('Junior_Py_Dev.pdf')
-# v,t = r.extract_text()
-# print(v,t)

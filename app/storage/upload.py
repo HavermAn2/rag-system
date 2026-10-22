@@ -16,7 +16,7 @@ class Upload:
             )
 
         points = [
-        self.models.PointStruct(
+        models.PointStruct(
             id=idx,
             vector=vector.tolist() if hasattr(vector, "tolist") else vector,
             payload={
@@ -32,4 +32,4 @@ class Upload:
             collection_name=self.collection_name,
             points=points
         )
-        return {"OK":200}
+        return print({"OK":200})
