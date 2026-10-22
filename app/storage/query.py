@@ -1,3 +1,4 @@
+
 class Query:
     def __init__(self, client, collection,model):
         self.client = client
@@ -5,10 +6,9 @@ class Query:
         self.embed_model = model
 
     def request_query(self,query, limit):
-        query_vector = self.embed_model.encode(query).tolist()
         res = self.client.query_points(
             collection_name=self.collection_name,
-            query=query_vector,
+            query=query,
             with_payload=True,
             limit= limit
         ).points

@@ -32,3 +32,4 @@ class Upload:
             collection_name=self.collection_name,
             points=points
         )
+        return {"OK":200}
