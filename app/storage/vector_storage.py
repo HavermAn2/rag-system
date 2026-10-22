@@ -41,19 +41,3 @@ client.upload_points(
 
 
 
-
-query_vector = model.encode(question).tolist()
-
-
-hits = client.query_points(
-    collection_name=COLLECTION_NAME,
-    query=query_vector,
-    with_payload=True,
-    limit=10
-).points
-
-for hit in hits:
-    print("Score:", hit.score)
-    print("Title:", hit.payload["title"])
-    print("Text:", hit.payload["text"])
-    print("Page:", hit.payload["page"])
