@@ -13,15 +13,16 @@ class Extraction:
         with pymupdf.open(self.path) as doc:
             for page_num, page in enumerate(doc, start=1):
                 text = page.get_text("text")
+                text += "\n"f"{page_num}"
 
                 if text.strip():
                     texts.append(text)
 
         text = "\n".join(texts)
 
-        Path("output.txt").write_text(
-            text,
-            encoding="utf-8"
-        )
+        # Path("output.txt").write_text(
+        #     text,
+        #     encoding="utf-8"
+        # )
         return text, title
 
