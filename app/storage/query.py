@@ -1,14 +1,15 @@
-
+from app.embeddings.embeddings import Embeddings
 class Query:
-    def __init__(self, client, collection,model):
+    def __init__(self, client, collection):
         self.client = client
         self.collection_name = collection
-        self.embed_model = model
+        self.embed_model = Embeddings()
 
     def request_query(self,query, limit):
+        tsk_embed = self.embed_model.query_to_vector(query)
         res = self.client.query_points(
             collection_name=self.collection_name,
-            query=query,
+            query=tsk_embed,
             with_payload=True,
             limit= limit
         ).points
