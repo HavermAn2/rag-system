@@ -19,10 +19,9 @@ class Extraction:
                     texts.append(text)
 
         text = "\n".join(texts)
-
-        # Path("output.txt").write_text(
-        #     text,
-        #     encoding="utf-8"
-        # )
         return text, title
-
+    
+    def extract_titles_only(self):
+        files_with_sub = [f for f in Path(f"{self.path}").iterdir() if f.is_file()]
+        files = [Path(f"{f}").name for f in files_with_sub]
+        return files
