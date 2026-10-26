@@ -7,6 +7,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI,  Request
 from pathlib import Path
 from app.services.document_service import DocumentService
+from app.services.ingestion_service import Ingestion
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -15,11 +16,9 @@ async def lifespan(app: FastAPI):
     model = SentenceTransformer("intfloat/multilingual-e5-base")
     query = Query(client,collection)
     extract = Extraction("/app/storage/data/Junior_Py_Dev.pdf")
-    FILE_STORAGE = Path("/app/storage/data").mkdir(
-    parents=True,
-    exist_ok=True
-)
+    FILE_STORAGE = Path("app/storage/data")
     document = DocumentService(FILE_STORAGE)
+    ingestion = Ingestion(FILE_STORAGE,client)
     
     app.state.model = model
     app.state.query = query
@@ -27,6 +26,7 @@ async def lifespan(app: FastAPI):
     app.state.client = client
     app.state.collection = collection
     app.state.document = document
+    app.state.ingestion = ingestion
     yield
 
     client.close()
@@ -49,9 +49,10 @@ async def get_file_names(request:Request):
     res = request.app.state.document.list_documents()
     return {"OK":200,"RES":res}
 @app.get("/app/v1/documents/{file_name}",status_code=200)
-async def get_file(request:Request,file_name: str):
-    res = request.app.state.document.list_document(file_name)
-    return res
+async def get_file(request:Request,file_name: Path):
+    txt = request.app.state.ingestion.extract(file_name)
+    cleand_txt = request.app.state.ingestion.clean_text(txt) # for optimization
+    return cleand_txt
 @app.delete("/app/v1/delete-document/{file_name}")
 async def del_file(file_name:str):
     return

@@ -1,4 +1,4 @@
-from app.embeddings.embeddings import Embeddings
+from app.services.embeddings_service import Embeddings
 class Query:
     def __init__(self, client, collection):
         self.client = client
