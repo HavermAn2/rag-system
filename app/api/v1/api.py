@@ -5,7 +5,8 @@ from sentence_transformers import SentenceTransformer
 from app.ingestion.extraction import Extraction
 from contextlib import asynccontextmanager
 from fastapi import FastAPI,  Request
-
+from pathlib import Path
+from app.services.document_service import DocumentService
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -13,18 +14,24 @@ async def lifespan(app: FastAPI):
     client = QdrantClient(url="http://localhost:6333")
     model = SentenceTransformer("intfloat/multilingual-e5-base")
     query = Query(client,collection)
-    file_storage = "app/storage/data"
-
-    app.state.file_storage = file_storage
+    extract = Extraction("/app/storage/data/Junior_Py_Dev.pdf")
+    FILE_STORAGE = Path("/app/storage/data").mkdir(
+    parents=True,
+    exist_ok=True
+)
+    document = DocumentService(FILE_STORAGE)
+    
     app.state.model = model
     app.state.query = query
+    app.state.extract = extract
     app.state.client = client
     app.state.collection = collection
+    app.state.document = document
     yield
 
     client.close()
 app = FastAPI(lifespan=lifespan)
-extract = Extraction("/app/storage/data/Junior_Py_Dev.pdf")
+
 @app.get("/api/v1/health",status_code=200)
 async def health():
     return {"message": "Hello World"}
@@ -35,14 +42,16 @@ async def query(request:Request,users_query:str, limit = 10 ):
     return {"OK":200,"RES":res}
 @app.post("/api/v1/document",status_code=201)
 async def upload_file(file:UploadFile):
+    #soon
     return{"filename": file.filename}
 @app.get("/app/v1/documents",status_code=200)
-async def get_file_names():
-    res = extract.extract_titles_only()
+async def get_file_names(request:Request):
+    res = request.app.state.document.list_documents()
     return {"OK":200,"RES":res}
 @app.get("/app/v1/documents/{file_name}",status_code=200)
-async def get_file(file_name: str):
-    return 
+async def get_file(request:Request,file_name: str):
+    res = request.app.state.document.list_document(file_name)
+    return res
 @app.delete("/app/v1/delete-document/{file_name}")
 async def del_file(file_name:str):
     return
