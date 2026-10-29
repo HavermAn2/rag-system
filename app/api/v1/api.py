@@ -5,7 +5,7 @@ from qdrant_client import QdrantClient
 from sentence_transformers import SentenceTransformer
 from app.ingestion.extraction import Extraction
 from contextlib import asynccontextmanager
-from fastapi import FastAPI,  Request
+from fastapi import FastAPI
 from pathlib import Path
 from app.services.document_service import DocumentService
 from app.services.ingestion_service import Ingestion
@@ -34,20 +34,5 @@ async def lifespan(app: FastAPI):
 
     app.state.client.close()
 app = FastAPI(lifespan=lifespan)
-
-
-
-
-
-
-
-# @app.get("/app/v1/documents/{file_name}",status_code=200)
-# async def get_file(request:Request,file_name: Path):
-#     txt = request.app.state.ingestion.extract(file_name)
-#     cleand_txt = request.app.state.ingestion.clean_text(txt) # for optimization
-#     return cleand_txt
-
-
-
 
 app.include_router(api_router, prefix="/api/v1")
