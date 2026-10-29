@@ -1,9 +1,10 @@
 from app.services.embeddings_service import Embeddings
+
 class Query:
-    def __init__(self, client, collection):
+    def __init__(self, client, collection, model):
         self.client = client
         self.collection_name = collection
-        self.embed_model = Embeddings()
+        self.embed_model = Embeddings(model)
 
     def request_query(self,query, limit):
         tsk_embed = self.embed_model.query_to_vector(query)
