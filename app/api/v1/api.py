@@ -30,6 +30,7 @@ async def lifespan(app: FastAPI):
     app.state.document = document
     app.state.ingestion = ingestion
     app.state.embeddings = embed
+    app.state.storage = FILE_STORAGE
     yield
 
     app.state.client.close()

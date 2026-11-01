@@ -8,7 +8,6 @@ router = APIRouter(
 
 @router.post("/", status_code=201)
 def upload_document(file:UploadFile,document:DocumentService = Depends(get_doc)):
-
     return document.upload_document(file)
 
 @router.get("/")
