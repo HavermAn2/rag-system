@@ -21,7 +21,7 @@ class Ingestion:
                 return text, text_for_chunking
 
     
-    def chunking(self, text, chunk_size=8, overlap=1):
+    def chunking(self, text, chunk_size=80, overlap=10):
         if chunk_size <= 0:
             raise ValueError("chunk_size must be positive")
 
@@ -54,17 +54,19 @@ class Ingestion:
         return words
 
 
-    # def clean_text(self,text: dict) -> dict:
-    #     pp = text
-    #     for page in pp:
-    #          for page_number, content in page.items():
-    #               if ("\uf0b7" or "\x0c" or "\xa0"):
-    #                 pp = content.replace("\uf0b7", "•")
-    #                 pp = content.replace("\x0c", "\n")
-    #                 pp = content.replace("\xa0", " ")
+    def clean_text(self,text: dict) -> dict:
 
-    #                 pp = re.sub(r"[ \t]+", " ", content)
-    #                 pp = re.sub(r"\n{3,}", "\n\n", content)
+        for page in text:
+             for page_number, content in page.items():
+                  if ("\uf0b7" or "\x0c" or "\xa0"):
+                    content = content.replace("\uf0b7", "•")
+                    content = content.replace("\x0c", "\n")
+                    content = content.replace("\xa0", " ")
 
-    #     return pp.strip()
+                    content = re.sub(r"[ \t]+", " ", content)
+                    content = re.sub(r"\n{3,}", "\n\n", content)
+                    page[page_number] = content
+
+        return text
+    
         
