@@ -21,7 +21,7 @@ class Ingestion:
                 return text, text_for_chunking
 
     
-    def chunking(self, text, chunk_size=80, overlap=10):
+    def chunking(self, text, chunk_size=15, overlap=3):
         if chunk_size <= 0:
             raise ValueError("chunk_size must be positive")
 
