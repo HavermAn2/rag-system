@@ -8,53 +8,63 @@ class Ingestion:
     
     def extract(self,file_name:str):
                 texts = []
+                text_for_chunking=[]
                 with pymupdf.open(self.path / file_name) as doc:
                     for page_num, page in enumerate(doc, start=1):
                         text = page.get_text("text")
-                        text += "\n"f"{page_num}"
+                        # text += "\n"f"{page_num}"
                         if text.strip():
                             texts.append(text)
+                        text_for_chunking.append({page_num : text})
         
                 text = "\n".join(texts)
-                return text
+                return text, text_for_chunking
 
     
-    def chunking(self,text,chunk_size=80, overlap=16):
+    def chunking(self, text, chunk_size=8, overlap=1):
         if chunk_size <= 0:
-            raise ValueError("chunk_size must be positive")     
+            raise ValueError("chunk_size must be positive")
+
         if not 0 <= overlap < chunk_size:
             raise ValueError("Invalid overlap")
 
-        chunk = []
-        word = ""
         words = []
-        for i, val in enumerate(text):
-            if val.isspace():
-                if word:
+
+        for page in text:
+            for page_number, content in page.items():
+                chunk = []
+
+                for word in content.split():
                     chunk.append(word)
-                    word = ""
 
                     if len(chunk) == chunk_size:
-                        words.append(chunk.copy())
-                        chunk = chunk[-overlap:]
-            else:
-                word += val
-        if word:
-            chunk.append(word)
+                        words.append({
+                            "page": page_number,
+                            "text": " ".join(chunk)
+                        })
 
-        if chunk and (not words or chunk != words[-1]):
-            words.append(chunk.copy())
-        words = [" ".join(chunk) for chunk in words]
+                        chunk = chunk[-overlap:] if overlap else []
+
+                if chunk and (not words or words[-1]["text"] != " ".join(chunk)):
+                    words.append({
+                        "page": page_number,
+                        "text": " ".join(chunk)
+                    })
+
         return words
-    
 
-    def clean_text(self,text: str) -> str:
-        text = text.replace("\uf0b7", "•")
-        text = text.replace("\x0c", "\n")
-        text = text.replace("\xa0", " ")
 
-        text = re.sub(r"[ \t]+", " ", text)
-        text = re.sub(r"\n{3,}", "\n\n", text)
+    # def clean_text(self,text: dict) -> dict:
+    #     pp = text
+    #     for page in pp:
+    #          for page_number, content in page.items():
+    #               if ("\uf0b7" or "\x0c" or "\xa0"):
+    #                 pp = content.replace("\uf0b7", "•")
+    #                 pp = content.replace("\x0c", "\n")
+    #                 pp = content.replace("\xa0", " ")
 
-        return text.strip()
+    #                 pp = re.sub(r"[ \t]+", " ", content)
+    #                 pp = re.sub(r"\n{3,}", "\n\n", content)
+
+    #     return pp.strip()
         
