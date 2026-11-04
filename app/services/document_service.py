@@ -1,7 +1,7 @@
 from pathlib import Path
 from uuid import uuid4
 from shutil import copyfileobj
-from app.tasks.tasks import test_task
+from app.tasks.tasks import upload_task,delete_task
 
 
 class DocumentService:
@@ -18,7 +18,7 @@ class DocumentService:
         with file_path.open("wb") as buffer:
             copyfileobj(file.file, buffer)
             print(buffer)
-        x = test_task.delay(filename)
+        x = upload_task.delay(filename)
         return x.id
 
     
@@ -44,5 +44,7 @@ class DocumentService:
             raise FileNotFoundError("File not found")
 
         file_path.unlink()
+        x = delete_task.delay(file_name)
+        return x.id
 
-        return file_name
+        

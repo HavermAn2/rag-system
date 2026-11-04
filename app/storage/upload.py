@@ -6,13 +6,7 @@ class Upload:
         self.collection_name = collection
         
     def create_point_qdrant(self,title,text,vectors):
-        # self.client.delete(
-        #     collection_name="docs",
-        #     points_selector=models.FilterSelector(
-        #         filter=models.Filter(must=[])
-        #     ),
-        #     wait=True
-        # )
+
         if not self.client.collection_exists(self.collection_name):
             self.client.create_collection(
                 collection_name=self.collection_name,
@@ -40,8 +34,21 @@ class Upload:
             collection_name=self.collection_name,
             points=points
         )
-        # print(type(text))
-        # print(type(text[0]))
-        # print(len(text))
-        # print(len(vectors))
-        return print({"OK":200})
+        return {"DONE": f"{title} was added to Qdrant"}
+
+    
+    def delete_point_qdrant(self,title):
+        self.client.delete(
+        collection_name=self.collection_name,
+        points_selector=models.FilterSelector(
+            filter=models.Filter(
+                must=[
+                    models.FieldCondition(
+                        key="title",
+                        match=models.MatchValue(value=title),
+                    ),
+                ],
+            )
+        ),
+    )
+        return {"DONE": f"{title} was deleted from Qdrant"}
