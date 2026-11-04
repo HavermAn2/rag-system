@@ -2,7 +2,7 @@ from pathlib import Path
 from uuid import uuid4
 from shutil import copyfileobj
 from app.tasks.tasks import upload_task,delete_task
-from app.core.exeptions import FileNotFoundError,InvalidPathError,ExtractionError
+from app.core.exceptions import FileNotFoundError,ExtractionError,InvalidDocumentError
 
 
 class DocumentService:
@@ -18,7 +18,6 @@ class DocumentService:
         file_path = self.path / filename
         with file_path.open("wb") as buffer:
             copyfileobj(file.file, buffer)
-            print(buffer)
         x = upload_task.delay(filename)
         return x.id
 
@@ -29,23 +28,32 @@ class DocumentService:
         return files
 
     
-    def get_document(self,file_name):
-        res = ''
+    def get_document(self, document_id: str):
+        file_path = self.path / document_id
+
+        if (
+            Path(document_id).name != document_id
+            or Path(document_id).suffix.lower() != ".pdf"
+        ):
+            raise InvalidDocumentError("Invalid document ID")
+
+        if not file_path.is_file():
+            raise FileNotFoundError(
+                f"Document {document_id} not found"
+            )
+
         try:
-            _,txt= self.ingestion.extract(file_name)
-            cleand_txt = self.ingestion.clean_text(txt) 
-            for page in cleand_txt:
-                for page_number, content in page.items():
-                    res +=content
+            pages = self.ingestion.extract(document_id)
+            cleaned_text = self.ingestion.clean_text(pages)
 
+        except Exception as exc:
+            raise ExtractionError(
+                f"Failed to extract document {document_id}"
+            ) from exc
 
-        except ExtractionError as exc:
-            print(f"Extraction failed: {exc}")
-        print (res)
-        return res
+        return cleaned_text
 
-
-    
+        
     def delete_document(self,file_name):
         file_path = Path(self.path) / Path(file_name)
         if not file_path.is_file():

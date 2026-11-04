@@ -1,5 +1,5 @@
 from app.services.embeddings_service import Embeddings
-
+from app.services.llm_service import llm
 class Query:
     def __init__(self, client, collection, model):
         self.client = client
@@ -14,4 +14,8 @@ class Query:
             with_payload=True,
             limit= limit
         ).points
-        return res
+        chunks = []
+        for point in res:
+            chunks.append(point.payload["text"])
+        answer = llm(chunks)
+        return answer

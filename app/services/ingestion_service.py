@@ -17,10 +17,10 @@ class Ingestion:
                             texts.append(text)
                         text_for_chunking.append({page_num : text})
                 text = "\n".join(texts)
-                return text, text_for_chunking
+                return text_for_chunking
 
     
-    def chunking(self, text, chunk_size=150, overlap=0):
+    def chunking(self, text, chunk_size=100, overlap=10):
         if chunk_size <= 0:
             raise ValueError("chunk_size must be positive")
 
