@@ -58,7 +58,6 @@ class Ingestion:
 
         for page in text:
              for page_number, content in page.items():
-                  if ("\uf0b7" or "\x0c" or "\xa0"):
                     content = content.replace("\uf0b7", "•")
                     content = content.replace("\x0c", "\n")
                     content = content.replace("\xa0", " ")

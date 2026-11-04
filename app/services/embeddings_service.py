@@ -4,7 +4,7 @@ class Embeddings:
         self.model = model
 
     def text_to_vector(self, texts: list[dict]):
-            passages = [text["text"]for text in texts]
+            passages = [f"passage: {text["text"]}"for text in texts]
             return self.model.encode(
                 passages,
                 batch_size=32,
