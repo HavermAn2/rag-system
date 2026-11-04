@@ -17,5 +17,5 @@ class Query:
         chunks = []
         for point in res:
             chunks.append(point.payload["text"])
-        answer = llm(chunks)
+        answer = llm(chunks,user_query = query)
         return answer
