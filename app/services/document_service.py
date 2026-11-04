@@ -2,6 +2,7 @@ from pathlib import Path
 from uuid import uuid4
 from shutil import copyfileobj
 from app.tasks.tasks import upload_task,delete_task
+from app.core.exeptions import FileNotFoundError,InvalidPathError,ExtractionError
 
 
 class DocumentService:
@@ -28,23 +29,39 @@ class DocumentService:
         return files
 
     
-    def get_document(self,document_id):
-        txt = self.ingestion.extract(document_id)
-        cleand_txt = self.ingestion.clean_text(txt) # for optimization
-        return cleand_txt
+    def get_document(self,file_name):
+        res = ''
+        try:
+            _,txt= self.ingestion.extract(file_name)
+            cleand_txt = self.ingestion.clean_text(txt) 
+            for page in cleand_txt:
+                for page_number, content in page.items():
+                    res +=content
+
+
+        except ExtractionError as exc:
+            print(f"Extraction failed: {exc}")
+        print (res)
+        return res
 
 
     
     def delete_document(self,file_name):
         file_path = Path(self.path) / Path(file_name)
-        print(file_path.parent,self.path)
-        if file_path.parent != self.path:
-            raise ValueError("Invalid path")
         if not file_path.is_file():
-            raise FileNotFoundError("File not found")
+            raise FileNotFoundError(
+                f"Document {file_name} not found"
+            )
+        task = delete_task.delay(str(file_path))
+        return task.id
 
-        file_path.unlink()
-        x = delete_task.delay(file_name)
-        return x.id
+
+        
+        
+        
+
+
+
+        
 
         

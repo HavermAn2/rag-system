@@ -9,17 +9,15 @@ from sentence_transformers import SentenceTransformer
 
 client = QdrantClient(url="http://localhost:6333")
 qdrant = Upload(client,"docs")
+FILE_STORAGE = Path("app/storage/data")
 @celery_app.task
 def upload_task(document_id: str):
     model = SentenceTransformer("intfloat/multilingual-e5-base")
-    FILE_STORAGE = Path("app/storage/data")
     INTERSECTION = Ingestion(FILE_STORAGE,client)
-    _,extraction = INTERSECTION.extract(document_id)
-    # clean_text = INTERSECTION.clean_text(extraction)
+    _,extraction = INTERSECTION.extract(document_id)   
     chunks = INTERSECTION.chunking(extraction)
     embed = Embeddings(model)
     embeds = embed.text_to_vector(chunks)
-    
     qdrant.create_point_qdrant(document_id,chunks,embeds)
     return {
         "document_id": document_id,
@@ -29,6 +27,8 @@ def upload_task(document_id: str):
 
 
 @celery_app.task
-def delete_task(document_id: str):
-    qdrant.delete_point_qdrant(document_id)
+def delete_task(file_path: str):
+    file_path = Path(file_path)
+    qdrant.delete_point_qdrant(file_path.name)
+    file_path.unlink()
     return {"Done":"Everything was deleted"}

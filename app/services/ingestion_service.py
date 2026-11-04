@@ -12,16 +12,15 @@ class Ingestion:
                 with pymupdf.open(self.path / file_name) as doc:
                     for page_num, page in enumerate(doc, start=1):
                         text = page.get_text("text")
-                        # text += "\n"f"{page_num}"
+                        text += "\n"f"{page_num}"
                         if text.strip():
                             texts.append(text)
                         text_for_chunking.append({page_num : text})
-        
                 text = "\n".join(texts)
                 return text, text_for_chunking
 
     
-    def chunking(self, text, chunk_size=15, overlap=3):
+    def chunking(self, text, chunk_size=150, overlap=0):
         if chunk_size <= 0:
             raise ValueError("chunk_size must be positive")
 
@@ -55,7 +54,6 @@ class Ingestion:
 
 
     def clean_text(self,text: dict) -> dict:
-
         for page in text:
              for page_number, content in page.items():
                     content = content.replace("\uf0b7", "•")
