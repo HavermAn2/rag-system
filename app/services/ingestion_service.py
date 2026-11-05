@@ -20,36 +20,28 @@ class Ingestion:
                 return text_for_chunking
 
     
-    def chunking(self, text, chunk_size=100, overlap=10):
+    def chunking(self, text, chunk_size=100, overlap=15):
         if chunk_size <= 0:
             raise ValueError("chunk_size must be positive")
-
         if not 0 <= overlap < chunk_size:
             raise ValueError("Invalid overlap")
-
         words = []
-
         for page in text:
             for page_number, content in page.items():
                 chunk = []
-
                 for word in content.split():
                     chunk.append(word)
-
                     if len(chunk) == chunk_size:
                         words.append({
                             "page": page_number,
                             "text": " ".join(chunk)
                         })
-
                         chunk = chunk[-overlap:] if overlap else []
-
-                if chunk and (not words or words[-1]["text"] != " ".join(chunk)):
-                    words.append({
-                        "page": page_number,
-                        "text": " ".join(chunk)
-                    })
-
+                if chunk and (len(chunk) > overlap or len(content.split()) < chunk_size):
+                        words.append({
+                            "page": page_number,
+                            "text": " ".join(chunk)
+                        })
         return words
 
 
