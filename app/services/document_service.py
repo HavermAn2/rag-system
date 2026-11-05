@@ -60,7 +60,7 @@ class DocumentService:
             raise FileNotFoundError(
                 f"Document {file_name} not found"
             )
-        task = delete_task.delay(str(file_path))
+        task = delete_task.delay(file_name)
         return task.id
 
 
