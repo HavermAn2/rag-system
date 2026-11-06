@@ -2,10 +2,8 @@ import logging
 from functools import lru_cache
 from pathlib import Path
 from uuid import UUID
-
 from qdrant_client import QdrantClient
 from sentence_transformers import SentenceTransformer
-
 from app.core.celery_app import celery_app
 from app.services.ingestion_service import Ingestion
 from app.services.embeddings_service import Embeddings
@@ -13,11 +11,9 @@ from app.services.qdrant_service import Upload
 
 
 logger = logging.getLogger(__name__)
-
 FILE_STORAGE = (
     Path(__file__).resolve().parents[1] / "storage" / "data"
 )
-
 COLLECTION_NAME = "docs"
 
 

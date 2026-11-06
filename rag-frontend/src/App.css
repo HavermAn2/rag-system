@@ -1,0 +1,18 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.app {
+  display: flex;
+  min-height: 100vh;
+  background: #0d0d12;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+}
